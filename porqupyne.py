@@ -63,30 +63,6 @@ class StateVector():
         # print(unique, counts)
         return measure_state, state_count/n
         
-    def apply_hadamard(self, bit_num, f='dia'):
-        """Apply a Hadamard gate to the quantum state vector.
-        Inputs:
-            bit_num:    The bit on which to apply the Hadamard operator.
-        """
-        hadgen = 0.7071067811865476 * np.array([[1, 1], [1, -1]])
-        hadamard = ss.kron(
-        ss.eye(2**(self.bit_count-bit_num), format=f), 
-        ss.kron(hadgen, ss.eye(2**(bit_num-1), format=f)))
-        # print(hadamard)
-        self.state = hadamard.dot(self.state)
-        return self.state
-        
-    def apply_phase(self, bit_num, theta, f='dia'):
-        phasegen = np.array([[1, 0], [0, np.exp(1j*theta)]])   
-        # print(np.sum(np.abs(phasegen)**2))
-        phase = ss.kron(
-        ss.eye(2**(self.bit_count-bit_num), format=f, dtype='complex64'), 
-        ss.kron(phasegen, ss.eye(2**(bit_num-1)
-        , format=f, dtype='complex64')))
-        # print(phase.toarray())
-        self.state = phase.dot(self.state)
-        return
-        
     def measure_all(self,
                     n=10000,
                     show_first=5,
@@ -110,3 +86,57 @@ class StateVector():
     def print_state(self):
         print(self.state)
         
+    ############################ PRIVATE METHODS ##############################
+    def __gate_gen1(root_gate, gate_bit_size, total_bits, applied_bit):
+        return 0
+    ###########################################################################
+        
+    ################################## GATES ##################################
+    def apply_cnot(self, control_bit, not_bit, f='dia'):
+        cnotgen = np.array([[1, 0, 0, 0],
+                            [0, 1, 0, 0],\
+                            [0, 0, 0, 1],\
+                            [0, 0, 1, 0]])
+        cnot = ss.kron(
+        ss.eye(2**(self.bit_count-bit_num), format=f), 
+        ss.kron(hadgen, ss.eye(2**(bit_num-1), format=f)))
+        return 0
+        
+    
+    def apply_hadamard(self, bit_num, f='dia'):
+        """Apply a Hadamard gate to the quantum state vector.
+        Inputs:
+            bit_num:    The bit on which to apply the Hadamard operator.
+        """
+        hadgen = 0.7071067811865476 * np.array([[1, 1], [1, -1]])
+        hadamard = ss.kron(
+        ss.eye(2**(self.bit_count-bit_num), format=f), 
+        ss.kron(hadgen, ss.eye(2**(bit_num-1), format=f)))
+        # print(hadamard)
+        self.state = hadamard.dot(self.state)
+        return 0
+        
+    def apply_pauli(self, bit_num, axis=0, f='dia'):
+        pauligen_store = np.array([[[0,1],[1,0]], 
+                                   [[0,-1j],[1j,0]],\
+                                   [[1,0],[0,-1]]])
+        pauligen = pauligen_store[axis]
+        pauli = ss.kron(
+        ss.eye(2**(self.bit_count-bit_num), format=f, dtype='complex64'), 
+        ss.kron(pauligen, ss.eye(2**(bit_num-1), 
+        format=f, dtype='complex64')))
+        self.state = pauli.dot(self.state)
+        return 0
+        
+        
+    def apply_phase(self, bit_num, theta, f='dia'):
+        phasegen = np.array([[1, 0], [0, np.exp(1j*theta)]])   
+        # print(np.sum(np.abs(phasegen)**2))
+        phase = ss.kron(
+        ss.eye(2**(self.bit_count-bit_num), format=f, dtype='complex64'), 
+        ss.kron(phasegen, ss.eye(2**(bit_num-1), 
+        format=f, dtype='complex64')))
+        # print(phase.toarray())
+        self.state = phase.dot(self.state)
+        return 0
+    ###########################################################################
