@@ -7,6 +7,8 @@ Created on Fri Sep 16 02:07:33 2016
 import numpy as np
 import scipy.sparse as ss
 from scipy.stats import itemfreq
+
+__all__ = ['StateVector']
 class StateVector():
     
     # Initialize a state vector for a given number of qubits.
@@ -42,6 +44,8 @@ class StateVector():
     
     # Initialize to a uniform random state.
     def init_rand(self):
+        """Initializes a given state vector to the cat state.
+        """
         state_size = self.size
         self.state = np.random.rand(state_size)+1j*np.random.rand(state_size)
         
@@ -66,8 +70,8 @@ class StateVector():
         """
         hadgen = 0.7071067811865476 * np.array([[1, 1], [1, -1]])
         hadamard = ss.kron(
-        ss.eye(2**(bit_num-1), format=f), 
-        ss.kron(hadgen, ss.eye(2**(self.bit_count-bit_num), format=f)))
+        ss.eye(2**(self.bit_count-bit_num), format=f), 
+        ss.kron(hadgen, ss.eye(2**(bit_num-1), format=f)))
         # print(hadamard)
         self.state = hadamard.dot(self.state)
         return self.state
@@ -76,8 +80,8 @@ class StateVector():
         phasegen = np.array([[1, 0], [0, np.exp(1j*theta)]])   
         # print(np.sum(np.abs(phasegen)**2))
         phase = ss.kron(
-        ss.eye(2**(bit_num-1), format=f, dtype='complex64'), 
-        ss.kron(phasegen, ss.eye(2**(self.bit_count-bit_num)
+        ss.eye(2**(self.bit_count-bit_num), format=f, dtype='complex64'), 
+        ss.kron(phasegen, ss.eye(2**(bit_num-1)
         , format=f, dtype='complex64')))
         # print(phase.toarray())
         self.state = phase.dot(self.state)
