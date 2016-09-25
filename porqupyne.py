@@ -88,6 +88,7 @@ class StateVector():
         
     ############################ PRIVATE METHODS ##############################
     def __gate_gen1(root_gate, gate_bit_size, total_bits, applied_bit):
+        # TODO: Common method to generate arbitrary gates from root gates.
         return 0
     ###########################################################################
         
