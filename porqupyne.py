@@ -98,9 +98,10 @@ class StateVector():
                             [0, 1, 0, 0],\
                             [0, 0, 0, 1],\
                             [0, 0, 1, 0]])
-        cnot = ss.kron(
+        # TODO: Learn about arbitrary 2-bit operators.
+        '''cnot = ss.kron(
         ss.eye(2**(self.bit_count-bit_num), format=f), 
-        ss.kron(hadgen, ss.eye(2**(bit_num-1), format=f)))
+        ss.kron(hadgen, ss.eye(2**(bit_num-1), format=f)))'''
         return 0
         
     
