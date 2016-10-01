@@ -27,7 +27,6 @@ def _gate_gen_(n_bits, bit_op, c_bits, t_bit):
     finalop = ss.eye(1)
     for a in range(n_bits):
         finalop = ss.kron(finalop, oparray[a])
-    # TODO: Common method to generate arbitrary gates from root gates.
     return finalop
 class StateVector():
     
