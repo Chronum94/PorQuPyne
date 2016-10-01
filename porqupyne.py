@@ -7,8 +7,28 @@ Created on Fri Sep 16 02:07:33 2016
 import numpy as np
 import scipy.sparse as ss
 from scipy.stats import itemfreq
+import matplotlib.pyplot as plt
 
-__all__ = ['StateVector']
+def _gate_gen_(n_bits, bit_op, c_bits, t_bit):
+    """Generates any arbitrary gate using monobit-gates, control gates,
+    and identity matrices:
+    Inputs:
+        bit_op      :The single-bit operation. NOT, Hadamard, phase shifts
+                    anything qualifies as long as it's on one bit.
+        c_bits      :The control bits. For a cnot gate, there is only one
+                    control gate. Toffoli'Fredkin has 2. And so on.
+        t_bit       : Target bit.
+    """
+    
+    oparray = np.eye(2).reshape([1, 2, 2]).repeat(3, axis=0)
+    oparray[c_bits-1, :, :] = np.array([[0, 0], [0, 1]])
+    oparray[t_bit-1, :, :] = bit_op
+    
+    finalop = ss.eye(1)
+    for a in range(n_bits):
+        finalop = ss.kron(finalop, oparray[a])
+    # TODO: Common method to generate arbitrary gates from root gates.
+    return finalop
 class StateVector():
     
     # Initialize a state vector for a given number of qubits.
@@ -81,27 +101,21 @@ class StateVector():
                 print("|{}>: {:0.4f}".format(
                 str(bin(int(entry[0]))[2:]).zfill(self.bit_count),
                     entry[1]))
+            plt.hist(measure)
         return state_count
         
     def print_state(self):
         print(self.state)
         
     ############################ PRIVATE METHODS ##############################
-    def __gate_gen1(root_gate, gate_bit_size, total_bits, applied_bit):
-        # TODO: Common method to generate arbitrary gates from root gates.
-        return 0
+    
     ###########################################################################
         
     ################################## GATES ##################################
-    def apply_cnot(self, control_bit, not_bit, f='dia'):
-        cnotgen = np.array([[1, 0, 0, 0],
-                            [0, 1, 0, 0],\
-                            [0, 0, 0, 1],\
-                            [0, 0, 1, 0]])
-        # TODO: Learn about arbitrary 2-bit operators.
-        '''cnot = ss.kron(
-        ss.eye(2**(self.bit_count-bit_num), format=f), 
-        ss.kron(hadgen, ss.eye(2**(bit_num-1), format=f)))'''
+    def apply_cnot(self, control_bit, target_bit, f='dia'):
+        op = np.array([[0, 1],[1, 0]])
+        cnot = _gate_gen_(self.bit_count, op, control_bit, target_bit)
+        self.state = cnot.dot(self.state)
         return 0
         
     
@@ -112,20 +126,25 @@ class StateVector():
         """
         hadgen = 0.7071067811865476 * np.array([[1, 1], [1, -1]])
         hadamard = ss.kron(
-        ss.eye(2**(self.bit_count-bit_num), format=f), 
-        ss.kron(hadgen, ss.eye(2**(bit_num-1), format=f)))
+        ss.eye(2**(bit_num-1), format=f), 
+        ss.kron(hadgen, ss.eye(2**(self.bit_count-bit_num), format=f)))
         # print(hadamard)
         self.state = hadamard.dot(self.state)
         return 0
         
     def apply_pauli(self, bit_num, axis=0, f='dia'):
+        """Apply a Hadamard gate to the quantum state vector.
+        Inputs:
+            bit_num:    The bit on which to apply the Hadamard operator.
+            axis:       Integer for axis. 0=x, 1=y, 2=z
+        """
         pauligen_store = np.array([[[0,1],[1,0]], 
                                    [[0,-1j],[1j,0]],\
                                    [[1,0],[0,-1]]])
         pauligen = pauligen_store[axis]
         pauli = ss.kron(
-        ss.eye(2**(self.bit_count-bit_num), format=f, dtype='complex64'), 
-        ss.kron(pauligen, ss.eye(2**(bit_num-1), 
+        ss.eye(2**(bit_num-1), format=f, dtype='complex64'), 
+        ss.kron(pauligen, ss.eye(2**(self.bit_count-bit_num), 
         format=f, dtype='complex64')))
         self.state = pauli.dot(self.state)
         return 0
@@ -141,4 +160,5 @@ class StateVector():
         # print(phase.toarray())
         self.state = phase.dot(self.state)
         return 0
+        
     ###########################################################################
