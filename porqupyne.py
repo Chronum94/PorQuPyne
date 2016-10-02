@@ -19,9 +19,11 @@ def _gate_gen_(n_bits, bit_op, c_bits, t_bit):
                     control gate. Toffoli'Fredkin has 2. And so on.
         t_bit       : Target bit.
     """
-    
-    oparray = np.eye(2).reshape([1, 2, 2]).repeat(3, axis=0)
-    oparray[c_bits-1, :, :] = np.array([[0, 0], [0, 1]])
+    t_bit = np.array(t_bit)
+    oparray = np.eye(2).reshape([1, 2, 2]).repeat(n_bits, axis=0)
+    if c_bits != -1:
+        oparray[c_bits-1, :, :] = np.array([[0, 0], [0, 1]])
+        
     oparray[t_bit-1, :, :] = bit_op
     
     finalop = ss.eye(1)
@@ -117,19 +119,23 @@ class StateVector():
         self.state = cnot.dot(self.state)
         return 0
         
+    def apply_cphase(self, control_bit, target_bit, theta, f='dia'):
+        op = np.array([[1, 0],[0, np.exp(1j*theta)]])
+        cphase = _gate_gen_(self.bit_count, op, control_bit, target_bit)
+        self.state = cphase.dot(self.state)
+        return 0
+        
     
-    def apply_hadamard(self, bit_num, f='dia'):
+    def apply_hadamard(self, bit_nums, f='dia'):
         """Apply a Hadamard gate to the quantum state vector.
         Inputs:
             bit_num:    The bit on which to apply the Hadamard operator.
         """
         hadgen = 0.7071067811865476 * np.array([[1, 1], [1, -1]])
-        hadamard = ss.kron(
-        ss.eye(2**(bit_num-1), format=f), 
-        ss.kron(hadgen, ss.eye(2**(self.bit_count-bit_num), format=f)))
+        hadamard = _gate_gen_(self.bit_count, hadgen, -1, bit_nums)
         # print(hadamard)
         self.state = hadamard.dot(self.state)
-        return 0
+        return
         
     def apply_pauli(self, bit_num, axis=0, f='dia'):
         """Apply a Hadamard gate to the quantum state vector.
