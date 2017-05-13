@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import time as t
 from numba import jit
 
-@jit
+
 def _gate_gen_(n_bits, bit_op, t_bit):
     """Generates any arbitrary gate using monobit-gates and identity matrices:
     Inputs:
@@ -41,7 +41,7 @@ def _gate_gen_(n_bits, bit_op, t_bit):
     # Returning the operator matrix.
     return finalop
   
-@jit
+
 def _cgate_gen_(n_bits, bit_op, c_bits, t_bits):
     """Generates any arbitrary gate using monobit-gates, control gates,
     and identity matrices:
@@ -95,7 +95,7 @@ class StateVector():
         self.bit_count = num_bits
         self.size = self.state.size
     
-    # Initialize to a basis state.
+    
     def init_basis(self, basis_state):
         """Initializes a given state vector to the desired basis state.
         Inputs:
@@ -110,7 +110,7 @@ class StateVector():
         self.state[basis_state-1] = 1
         return self.state
     
-    # Initialize to a given cat state.
+    
     def init_cat(self):
         """Initializes a given state vector to the cat state.
         """
@@ -148,12 +148,8 @@ class StateVector():
         # print(unique, counts)
         return state_count/n
         
-    def measure_all(self,
-                    n=100000,
-                    show_first=5,
-                    print_pretty=False,
-                    sort=False,
-                    plot=False):
+    def measure_all(self, n=100000, show_first=5, print_pretty=False,
+                    sort=False, plot=False):
         """Measures all states.
         Inputs:
             show_first  : If print_pretty, specifies number of states to print.
@@ -209,7 +205,6 @@ class StateVector():
         op = np.array([[0, 1],[1, 0]])
         cnot = _cgate_gen_(self.bit_count, op, control_bit, target_bit)
         self.state = cnot.dot(self.state)
-        return 0
         
     def cphase(self, control_bit, target_bit, theta, f='dia'):
         """Applies a CPHASE gate.
@@ -223,7 +218,6 @@ class StateVector():
         op = np.array([[1, 0],[0, np.exp(1j*theta)]])
         cphase = _gate_gen_(self.bit_count, op, control_bit, target_bit)
         self.state = cphase.dot(self.state)
-        return 0
         
     
     def hadamard(self, bit_nums, f='dia'):
@@ -238,6 +232,13 @@ class StateVector():
         hadgen = 0.7071067811865476 * np.array([[1, 1], [1, -1]])
         bit_nums = np.array(bit_nums)
         stride_size = 4
+        
+        # The Hadamard gate is built and applied in strides.
+        # Since a full Hadamard matrix is completely dense, it would be
+        # prohibitive to apply a 20-qubit gate, for example, at once.
+        # So we apply a small number of gates at a time. 4 is a good number
+        # for even the largest matrices. You'll be running out of memory
+        # by then anyway.
         
         # print("Commencing Hadamard...")
         tbegin = t.time()
@@ -275,7 +276,6 @@ class StateVector():
         # print(bit_nums)
             self.state = hadamard.dot(self.state)
         # print("Hadamard done: {:0.3f} seconds.".format(t.time()-tbegin))
-        return
         
     def pauli(self, bit_num, axis=0, f='dia'):
         """Apply a Pauli gate to the quantum state vector.
