@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Fri Sep 16 02:07:33 2016
-
-@author: Chronum
-"""
 # Bunch of imports. The itemfreq import is used for the measure methods.
 # The time import is used to measure gate times.
 # The jit import is used to speed up stuff involving loops, if any.
@@ -82,7 +77,8 @@ def _cgate_gen_(n_bits, bit_op, c_bits, t_bits):
     finalop += ss.eye(int(2**n_bits))
     # print(finalop.toarray())
     return finalop
-    
+
+
 # %% State vector and methods.
 class StateVector():
 

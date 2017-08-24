@@ -5,4 +5,6 @@ Created on Sat Sep 24 11:50:40 2016
 @author: Chronum
 """
 
-import porqupyne
+from .porqupyne import *
+
+__all__ = ["StateVector"]
