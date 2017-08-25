@@ -36,3 +36,18 @@ class StateVector:
 
     def cat(self):
         self.state[0] = self.state[1] = 1/StateVector.sqrt2
+
+    def randu(self):
+        state_size = self.size
+        self.state = np.random.rand(state_size) + \
+                     1j * np.random.rand(state_size)
+        # SPEED: np.linalg.norm(a) is ~10-15x faster than:
+        #        np.sum(np.abs(a)**2) or np.sum(np.conjugate(a)*a) at
+        #        np.sum(np.abs(a)*np.abs(a))
+        self.state = self.state / np.linalg.norm(self.state)
+
+
+    def cnot(self, control_qubit, target_qubit):
+
+        # The NOT operator for a single qubit.
+        op = np.array([[0, 1], [1, 0]])
