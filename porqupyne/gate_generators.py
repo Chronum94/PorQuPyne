@@ -9,7 +9,7 @@ def _gate_gen_(n_qbits, qbit_op, target_qbits):
         qbit_op: The single-qubit operation. NOT, Hadamard,
                  phase shifts, anything qualifies as long as
                  it's on one bit.
-        target_bits: Target qubit.
+        target_bits: Target qubit(s).
     """
 
     target_qbits = np.array(target_qbits)
